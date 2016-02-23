@@ -23,7 +23,7 @@
 // Based on the publication(s):
 // - Steffen Rendle (2012): Learning Recommender Systems with Adaptive
 //   Regularization, in Proceedings of the 5th ACM International Conference on
-//   Web Search and Data Mining (WSDM 2012), Seattle, USA.  
+//   Web Search and FmData Mining (WSDM 2012), Seattle, USA.  
 //
 // theta' = theta - alpha*(grad_theta + 2*lambda*theta)
 //        = theta(1-2*alpha*lambda) - alpha*grad_theta
@@ -56,7 +56,7 @@ class fm_learn_sgd_element_adapt_reg: public fm_learn_sgd {
 		DVector<double> grad_w; 
 		DMatrix<double> grad_v;
 
-		Data* validation;
+		FmData* validation;
 
 		// local parameters in the lambda_update step
 		DVector<double> lambda_w_grad;
@@ -261,7 +261,7 @@ class fm_learn_sgd_element_adapt_reg: public fm_learn_sgd {
 			}			
 		}
 
-		virtual void learn(Data& train, Data& test) {
+		virtual void learn(FmData& train, FmData& test) {
 			fm_learn_sgd::learn(train, test);
 
 			std::cout << "Training using self-adaptive-regularization SGD."<< std::endl << "DON'T FORGET TO SHUFFLE THE ROWS IN TRAINING AND VALIDATION DATA TO GET THE BEST RESULTS." << std::endl; 

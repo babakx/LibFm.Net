@@ -23,7 +23,7 @@
 //
 // Based on the publication(s):
 // - Steffen Rendle (2010): Factorization Machines, in Proceedings of the 10th
-//   IEEE International Conference on Data Mining (ICDM 2010), Sydney,
+//   IEEE International Conference on FmData Mining (ICDM 2010), Sydney,
 //   Australia.
 // - Steffen Rendle, Zeno Gantner, Christoph Freudenthaler, Lars Schmidt-Thieme
 //   (2011): Fast Context-aware Recommendations with Factorization Machines, in
@@ -34,8 +34,8 @@
 //   and Low-rank Approximation (NIPS-WS 2011), Spain.
 // - Steffen Rendle (2012): Factorization Machines with libFM, ACM Transactions
 //   on Intelligent Systems and Technology (TIST 2012).
-// - Steffen Rendle (2013): Scaling Factorization Machines to Relational Data,
-//   in Proceedings of the 39th international conference on Very Large Data
+// - Steffen Rendle (2013): Scaling Factorization Machines to Relational FmData,
+//   in Proceedings of the 39th international conference on Very Large FmData
 //   Bases (VLDB 2013), Trento, Italy.
 
 #ifndef FM_LEARN_MCMC_H_
@@ -61,9 +61,9 @@ struct relation_cache {
 
 class fm_learn_mcmc : public fm_learn {
 	public:
-		virtual double evaluate(Data& data) { return std::numeric_limits<double>::quiet_NaN(); }
+		virtual double evaluate(FmData& data) { return std::numeric_limits<double>::quiet_NaN(); }
 	protected:
-		virtual double predict_case(Data& data) {
+		virtual double predict_case(FmData& data) {
 			throw "not supported for MCMC and ALS";
 		}
 	public:
@@ -98,14 +98,14 @@ class fm_learn_mcmc : public fm_learn {
 
 		DVector<relation_cache*> rel_cache;
 
-		virtual void _learn(Data& train, Data& test) {};
+		virtual void _learn(FmData& train, FmData& test) {};
 	
 
 		/**
 			This function predicts all datasets mentioned in main_data.
 			It stores the prediction in the e-term.
 		*/
-		void predict_data_and_write_to_eterms(DVector<Data*>& main_data, DVector<e_q_term*>& main_cache) {
+		void predict_data_and_write_to_eterms(DVector<FmData*>& main_data, DVector<e_q_term*>& main_cache) {
 
 			assert(main_data.dim == main_cache.dim);
 			if (main_data.dim == 0) { return ; }
@@ -115,7 +115,7 @@ class fm_learn_mcmc : public fm_learn {
 			// do this using only the transpose copy of the training data:
 			for (uint ds = 0; ds < main_cache.dim; ds++) {
 				e_q_term* m_cache = main_cache(ds);
-				Data* m_data = main_data(ds);
+				FmData* m_data = main_data(ds);
 				for (uint i = 0; i < m_data->num_cases; i++) {
 					m_cache[i].e = 0.0;
 					m_cache[i].q = 0.0;
@@ -140,7 +140,7 @@ class fm_learn_mcmc : public fm_learn {
 				// Complexity: O(N_z(X^M))
 				for (uint ds = 0; ds < main_cache.dim; ds++) {
 					e_q_term* m_cache = main_cache(ds);
-					Data* m_data = main_data(ds);
+					FmData* m_data = main_data(ds);
 					m_data->data_t->begin();
 					uint row_index;
 					sparse_row<DATA_FLOAT>* feature_data;
@@ -188,7 +188,7 @@ class fm_learn_mcmc : public fm_learn {
 				// O(n*|B|)
 				for (uint ds = 0; ds < main_cache.dim; ds++) {
 					e_q_term* m_cache = main_cache(ds);
-					Data* m_data = main_data(ds);
+					FmData* m_data = main_data(ds);
 					for (uint c = 0; c < m_data->num_cases; c++) {
 						double q_all = m_cache[c].q;
 							for (uint r = 0; r < m_data->relation.dim; r++) {
@@ -219,7 +219,7 @@ class fm_learn_mcmc : public fm_learn {
 				// Complexity: O(N_z(X^M))
 				for (uint ds = 0; ds < main_cache.dim; ds++) {
 					e_q_term* m_cache = main_cache(ds);
-					Data* m_data = main_data(ds);
+					FmData* m_data = main_data(ds);
 		
 					m_data->data_t->begin();
 					uint row_index;
@@ -268,7 +268,7 @@ class fm_learn_mcmc : public fm_learn {
 			if (fm->k1) {
 				for (uint ds = 0; ds < main_cache.dim; ds++) {
 					e_q_term* m_cache = main_cache(ds);
-					Data* m_data = main_data(ds);
+					FmData* m_data = main_data(ds);
 					m_data->data_t->begin();
 					uint row_index;
 					sparse_row<DATA_FLOAT>* feature_data;
@@ -312,7 +312,7 @@ class fm_learn_mcmc : public fm_learn {
 			// (3) merge both for getting the prediction: w0+e(c)+q(c)
 			for (uint ds = 0; ds < main_cache.dim; ds++) {
 				e_q_term* m_cache = main_cache(ds);
-				Data* m_data = main_data(ds);
+				FmData* m_data = main_data(ds);
 			
 				for (uint c = 0; c < m_data->num_cases; c++) {
 					double q_all = m_cache[c].q;
@@ -343,7 +343,7 @@ class fm_learn_mcmc : public fm_learn {
 
 
 	public:
-		virtual void predict(Data& data, DVector<double>& out) {
+		virtual void predict(FmData& data, DVector<double>& out) {
 			assert(data.num_cases == out.dim);
 			if (do_sample) {
 				assert(data.num_cases == pred_sum_all.dim);
@@ -372,7 +372,7 @@ class fm_learn_mcmc : public fm_learn {
 
 
 
-		void add_main_q(Data& train, uint f) {
+		void add_main_q(FmData& train, uint f) {
 			// add the q(f)-terms to the main relation q-cache (using only the transpose data)
 			
 			double* v = fm->v.value[f];
@@ -399,7 +399,7 @@ class fm_learn_mcmc : public fm_learn {
 			}
 		}		
 
-		void draw_all(Data& train) {
+		void draw_all(FmData& train) {
 			std::ostringstream ss;
 
 			draw_alpha(alpha, train.num_cases);
@@ -616,7 +616,7 @@ class fm_learn_mcmc : public fm_learn {
 
 
 		// Find the optimal value for the global bias (0-way interaction)
-		void draw_w0(double& w0, double& reg, Data& train) {
+		void draw_w0(double& w0, double& reg, FmData& train) {
 			// h = 1
 			// h^2 = 1
 			// \sum e*h = \sum e
@@ -1142,7 +1142,7 @@ class fm_learn_mcmc : public fm_learn {
 		}
 		
 		
-		virtual void learn(Data& train, Data& test) {
+		virtual void learn(FmData& train, FmData& test) {
 			pred_sum_all.setSize(test.num_cases);
 			pred_sum_all_but5.setSize(test.num_cases);
 			pred_this.setSize(test.num_cases);

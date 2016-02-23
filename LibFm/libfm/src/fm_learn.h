@@ -35,7 +35,7 @@ class fm_learn {
 		DMatrix<double> pred_q_term;
 		
 		// this function can be overwritten (e.g. for MCMC)
-		virtual double predict_case(Data& data) {
+		virtual double predict_case(FmData& data) {
 			return fm->predict(data.data->getRow());
 		}
 		
@@ -50,7 +50,7 @@ class fm_learn {
 		const static int TASK_REGRESSION = 0;
 		const static int TASK_CLASSIFICATION = 1;
  
-		Data* validation;	
+		FmData* validation;	
 
 
 		RLog* log;
@@ -78,7 +78,7 @@ class fm_learn {
 			pred_q_term.setSize(fm->num_factor, meta->num_relations + 1);
 		}
 
-		virtual double evaluate(Data& data) {
+		virtual double evaluate(FmData& data) {
 			assert(data.data != NULL);
 			if (task == TASK_REGRESSION) {
 				return evaluate_regression(data);
@@ -90,9 +90,9 @@ class fm_learn {
 		}
 
 	public:
-		virtual void learn(Data& train, Data& test) { }
+		virtual void learn(FmData& train, FmData& test) { }
 		
-		virtual void predict(Data& data, DVector<double>& out) = 0;
+		virtual void predict(FmData& data, DVector<double>& out) = 0;
 		
 		virtual void debug() { 
 			std::cout << "task=" << task << std::endl;
@@ -101,7 +101,7 @@ class fm_learn {
 		}
 
 	protected:
-		virtual double evaluate_classification(Data& data) {
+		virtual double evaluate_classification(FmData& data) {
 			int num_correct = 0;
 			double eval_time = getusertime();
 			for (data.data->begin(); !data.data->end(); data.data->next()) {
@@ -119,7 +119,7 @@ class fm_learn {
 
 			return (double) num_correct / (double) data.data->getNumRows();
 		}
-		virtual double evaluate_regression(Data& data) {
+		virtual double evaluate_regression(FmData& data) {
 			double rmse_sum_sqr = 0;
 			double mae_sum_abs = 0;
 			double eval_time = getusertime();

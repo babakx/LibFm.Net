@@ -21,7 +21,7 @@
 //
 // Based on the publication(s):
 // - Steffen Rendle (2010): Factorization Machines, in Proceedings of the 10th
-//   IEEE International Conference on Data Mining (ICDM 2010), Sydney,
+//   IEEE International Conference on FmData Mining (ICDM 2010), Sydney,
 //   Australia.
 
 #ifndef FM_LEARN_SGD_H_
@@ -45,7 +45,7 @@ class fm_learn_sgd: public fm_learn {
 		//	sum_sqr.setSize(fm->num_factor);
 		}		
 
-		virtual void learn(Data& train, Data& test) { 
+		virtual void learn(FmData& train, FmData& test) { 
 			fm_learn::learn(train, test);
 			std::cout << "learnrate=" << learn_rate << std::endl;
 			std::cout << "learnrates=" << learn_rates(0) << "," << learn_rates(1) << "," << learn_rates(2) << std::endl;
@@ -66,7 +66,7 @@ class fm_learn_sgd: public fm_learn {
 			fm_learn::debug();			
 		}
 
-		virtual void predict(Data& data, DVector<double>& out) {
+		virtual void predict(FmData& data, DVector<double>& out) {
 			assert(data.data->getNumRows() == out.dim);
 			for (data.data->begin(); !data.data->end(); data.data->next()) {
 				double p = predict_case(data);

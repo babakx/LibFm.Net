@@ -17,7 +17,7 @@
 // along with libFM.  If not, see <http://www.gnu.org/licenses/>.
 //
 //
-// data.h: Data container for Factorization Machines
+// data.h: FmData container for Factorization Machines
 
 #ifndef DATA_H_
 #define DATA_H_
@@ -70,13 +70,13 @@ class DataMetaInfo {
 
 #include "relation.h"
 
-class Data {
+class FmData {
 	protected:
 		uint64 cache_size;
 		bool has_xt;
 		bool has_x;
 	public:	
-		Data(uint64 cache_size, bool has_x, bool has_xt) { 
+		FmData(uint64 cache_size, bool has_x, bool has_xt) { 
 			this->data_t = NULL;
 			this->data = NULL;
 			this->cache_size = cache_size;
@@ -102,7 +102,7 @@ class Data {
 		void create_data_t();
 };
 
-void Data::load(std::string filename) {
+void FmData::load(std::string filename) {
 
 	std::cout << "has x = " << has_x << std::endl;
 	std::cout << "has xt = " << has_xt << std::endl;
@@ -281,7 +281,7 @@ void Data::load(std::string filename) {
 	if (has_xt) {create_data_t();}
 }
 
-void Data::create_data_t() {
+void FmData::create_data_t() {
 	// for creating transpose data, the data has to be memory-data because we use random access
 	DVector< sparse_row<DATA_FLOAT> >& data = ((LargeSparseMatrixMemory<DATA_FLOAT>*)this->data)->data;
 
@@ -333,7 +333,7 @@ void Data::create_data_t() {
 }
 
 
-void Data::debug() {
+void FmData::debug() {
 	if (has_x) {
 		for (data->begin(); (!data->end()) && (data->getRowIndex() < 4); data->next() ) {
 			std::cout << target(data->getRowIndex());

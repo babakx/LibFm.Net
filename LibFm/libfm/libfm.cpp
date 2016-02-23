@@ -21,7 +21,7 @@
 //
 // Based on the publication(s):
 // - Steffen Rendle (2010): Factorization Machines, in Proceedings of the 10th
-//   IEEE International Conference on Data Mining (ICDM 2010), Sydney,
+//   IEEE International Conference on FmData Mining (ICDM 2010), Sydney,
 //   Australia.
 // - Steffen Rendle, Zeno Gantner, Christoph Freudenthaler, Lars Schmidt-Thieme
 //   (2011): Fast Context-aware Recommendations with Factorization Machines, in
@@ -32,11 +32,11 @@
 //   and Low-rank Approximation (NIPS-WS 2011), Spain.
 // - Steffen Rendle (2012): Learning Recommender Systems with Adaptive
 //   Regularization, in Proceedings of the 5th ACM International Conference on
-//   Web Search and Data Mining (WSDM 2012), Seattle, USA.  
+//   Web Search and FmData Mining (WSDM 2012), Seattle, USA.  
 // - Steffen Rendle (2012): Factorization Machines with libFM, ACM Transactions
 //   on Intelligent Systems and Technology (TIST 2012).
-// - Steffen Rendle (2013): Scaling Factorization Machines to Relational Data,
-//   in Proceedings of the 39th international conference on Very Large Data
+// - Steffen Rendle (2013): Scaling Factorization Machines to Relational FmData,
+//   in Proceedings of the 39th international conference on Very Large FmData
 //   Bases (VLDB 2013), Trento, Italy.
 #define _CRT_SECURE_NO_WARNINGS
 
@@ -127,7 +127,7 @@ int main(int argc, char **argv) {
 
 		// (1) Load the data
 		std::cout << "Loading train...\t" << std::endl;
-		Data train(
+		FmData train(
 			cmdline.getValue(param_cache_size, 0),
 			! (!cmdline.getValue(param_method).compare("mcmc")), // no original data for mcmc
 			! (!cmdline.getValue(param_method).compare("sgd") || !cmdline.getValue(param_method).compare("sgda")) // no transpose data for sgd, sgda
@@ -136,7 +136,7 @@ int main(int argc, char **argv) {
 		if (cmdline.getValue(param_verbosity, 0) > 0) { train.debug(); }
 
 		std::cout << "Loading test... \t" << std::endl;
-		Data test(
+		FmData test(
 			cmdline.getValue(param_cache_size, 0),
 			! (!cmdline.getValue(param_method).compare("mcmc")), // no original data for mcmc
 			! (!cmdline.getValue(param_method).compare("sgd") || !cmdline.getValue(param_method).compare("sgda")) // no transpose data for sgd, sgda
@@ -144,13 +144,13 @@ int main(int argc, char **argv) {
 		test.load(cmdline.getValue(param_test_file));
 		if (cmdline.getValue(param_verbosity, 0) > 0) { test.debug(); }
 
-		Data* validation = NULL;
+		FmData* validation = NULL;
 		if (cmdline.hasParameter(param_val_file)) {
 			if (cmdline.getValue(param_method).compare("sgda")) {
 				std::cout << "WARNING: Validation data is only used for SGDA. The data is ignored." << std::endl;
 			} else {
 				std::cout << "Loading validation set...\t" << std::endl;
-				validation = new Data(
+				validation = new FmData(
 					cmdline.getValue(param_cache_size, 0),
 					! (!cmdline.getValue(param_method).compare("mcmc")), // no original data for mcmc
 					! (!cmdline.getValue(param_method).compare("sgd") || !cmdline.getValue(param_method).compare("sgda")) // no transpose data for sgd, sgda

@@ -22,7 +22,7 @@
 //
 // Based on the publication(s):
 // - Steffen Rendle (2010): Factorization Machines, in Proceedings of the 10th
-//   IEEE International Conference on Data Mining (ICDM 2010), Sydney,
+//   IEEE International Conference on FmData Mining (ICDM 2010), Sydney,
 //   Australia.
 // - Steffen Rendle, Zeno Gantner, Christoph Freudenthaler, Lars Schmidt-Thieme
 //   (2011): Fast Context-aware Recommendations with Factorization Machines, in
@@ -33,8 +33,8 @@
 //   and Low-rank Approximation (NIPS-WS 2011), Spain.
 // - Steffen Rendle (2012): Factorization Machines with libFM, ACM Transactions
 //   on Intelligent Systems and Technology (TIST 2012).
-// - Steffen Rendle (2013): Scaling Factorization Machines to Relational Data,
-//   in Proceedings of the 39th international conference on Very Large Data
+// - Steffen Rendle (2013): Scaling Factorization Machines to Relational FmData,
+//   in Proceedings of the 39th international conference on Very Large FmData
 //   Bases (VLDB 2013), Trento, Italy.
 
 #ifndef FM_LEARN_MCMC_SIMULTANEOUS_H_
@@ -46,13 +46,13 @@
 class fm_learn_mcmc_simultaneous : public fm_learn_mcmc {
 	protected:
 		
-		virtual void _learn(Data& train, Data& test) {
+		virtual void _learn(FmData& train, FmData& test) {
 			
 			uint num_complete_iter = 0;
 
 			// make a collection of datasets that are predicted jointly
 			int num_data = 2;
-			DVector<Data*> main_data(num_data);
+			DVector<FmData*> main_data(num_data);
 			DVector<e_q_term*> main_cache(num_data);
 			main_data(0) = &train;
 			main_data(1) = &test;

@@ -20,14 +20,20 @@
 #include "libfm/src/fm_learn_sgd_element_adapt_reg.h"
 #include "libfm/src/fm_learn_mcmc_simultaneous.h"
 
+using namespace System;
+
 namespace LibFm {
 
 	public ref class LibFmManager
 	{
 	private:
-		fm_model* fm;
+		fm_model *fm;
+		FmData *train;
+		fm_learn* fml;
+
 	public:
-		int Train(int argc, char **params)
+		
+		void Train(int argc, char **params)
 		{
 			try {
 				CMDLine cmdline(argc, params);
@@ -63,14 +69,14 @@ namespace LibFm {
 
 				// (1) Load the data
 				std::cout << "Loading train...\t" << std::endl;
-				Data train(0,
+				FmData train(0,
 					!(!cmdline.getValue(param_method).compare("mcmc")), // no original data for mcmc
 					!(!cmdline.getValue(param_method).compare("sgd") || !cmdline.getValue(param_method).compare("sgda")) // no transpose data for sgd, sgda
 					);
 				train.load(cmdline.getValue(param_train_file));
 
 				std::cout << "Loading test... \t" << std::endl;
-				Data test(0,
+				FmData test(0,
 					!(!cmdline.getValue(param_method).compare("mcmc")), // no original data for mcmc
 					!(!cmdline.getValue(param_method).compare("sgd") || !cmdline.getValue(param_method).compare("sgda")) // no transpose data for sgd, sgda
 					);
@@ -96,7 +102,6 @@ namespace LibFm {
 
 
 				// (3) Setup the learning method:
-				fm_learn* fml;
 				if (!cmdline.getValue(param_method).compare("sgd")) {
 					fml = new fm_learn_sgd_element();
 					((fm_learn_sgd*)fml)->num_iter = cmdline.getValue(param_num_iter, 100);

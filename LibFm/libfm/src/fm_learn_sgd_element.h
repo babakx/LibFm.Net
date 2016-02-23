@@ -22,7 +22,7 @@
 //
 // Based on the publication(s):
 // - Steffen Rendle (2010): Factorization Machines, in Proceedings of the 10th
-//   IEEE International Conference on Data Mining (ICDM 2010), Sydney,
+//   IEEE International Conference on FmData Mining (ICDM 2010), Sydney,
 //   Australia.
 
 #ifndef FM_LEARN_SGD_ELEMENT_H_
@@ -39,7 +39,7 @@ class fm_learn_sgd_element: public fm_learn_sgd {
 				log->addField("rmse_train", std::numeric_limits<double>::quiet_NaN());
 			}
 		}
-		virtual void learn(Data& train, Data& test) {
+		virtual void learn(FmData& train, FmData& test) {
 			fm_learn_sgd::learn(train, test);
 
 			std::cout << "SGD: DON'T FORGET TO SHUFFLE THE ROWS IN TRAINING DATA TO GET THE BEST RESULTS." << std::endl; 
