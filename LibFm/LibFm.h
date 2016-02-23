@@ -21,8 +21,17 @@
 #include "libfm/src/fm_learn_mcmc_simultaneous.h"
 
 using namespace System;
+using namespace System::Collections::Generic;
 
 namespace LibFm {
+
+	public ref class FeatureVector
+	{
+	public:
+		float target;
+		List<int> ^featureIds;
+		List<float> ^featureValues;
+	};
 
 	public ref class LibFmManager
 	{
@@ -32,7 +41,11 @@ namespace LibFm {
 		fm_learn* fml;
 
 	public:
-		
+		void AddTrainVector(FeatureVector ^v)
+		{
+			
+		}
+
 		void Train(int argc, char **params)
 		{
 			try {

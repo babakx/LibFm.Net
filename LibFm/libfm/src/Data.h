@@ -90,16 +90,80 @@ class FmData {
 
 		int num_feature;
 		uint num_cases;
- 
+		int num_rows = 0;
+		int row_id = 0;
+		sparse_entry<DATA_FLOAT>* cache;
+
 		DATA_FLOAT min_target;
 		DATA_FLOAT max_target;
 
 		DVector<RelationJoin> relation;
 		
 		void load(std::string filename);	
+		void initialize(DATA_FLOAT minRating, DATA_FLOAT maxRating, int num_rows, uint64 num_values, int num_feat);
+		void finalizeData();
+		void addFeatureVecor(std::string line);
 		void debug();
 
 		void create_data_t();
+};
+
+void FmData::initialize(DATA_FLOAT minRating, DATA_FLOAT maxRating, int num_rows, uint64 num_values, int num_feat)
+{
+	min_target = minRating;
+	max_target = maxRating;
+
+	this->data = new LargeSparseMatrixMemory<DATA_FLOAT>();
+
+	((LargeSparseMatrixMemory<DATA_FLOAT>*)this->data)->data.setSize(num_rows);
+	target.setSize(num_rows);
+	
+	num_feature = num_feat;
+
+	((LargeSparseMatrixMemory<DATA_FLOAT>*)this->data)->num_cols = num_feat;
+	((LargeSparseMatrixMemory<DATA_FLOAT>*)this->data)->num_values = num_values;
+
+	cache = new sparse_entry<DATA_FLOAT>[num_values];
+};
+
+void FmData::finalizeData()
+{
+	num_cases = target.dim;
+
+	if (has_xt) {create_data_t();}
+}
+
+void FmData::addFeatureVecor(std::string line)
+{
+	uint64 cache_id = 0;
+	DATA_FLOAT _value;
+	int nchar, _feature;
+
+	DVector< sparse_row<DATA_FLOAT> >& data = ((LargeSparseMatrixMemory<DATA_FLOAT>*)this->data)->data;
+
+	const char *pline = line.c_str();
+	while ((*pline == ' ') || (*pline == 9)) { pline++; } // skip leading spaces
+	if (sscanf(pline, "%f%n", &_value, &nchar) >= 1) {
+		pline += nchar;
+		assert(row_id < num_rows);
+		target.value[row_id] = _value;
+		data.value[row_id].data = &(cache[cache_id]);
+		data.value[row_id].size = 0;
+
+		while (sscanf(pline, "%d:%f%n", &_feature, &_value, &nchar) >= 2) {
+			pline += nchar;
+			assert(cache_id < num_values);
+			cache[cache_id].id = _feature;
+			cache[cache_id].value = _value;
+			cache_id++;
+			data.value[row_id].size++;
+		}
+		row_id++;
+
+		while ((*pline != 0) && ((*pline == ' ') || (*pline == 9))) { pline++; } // skip trailing spaces
+	} else {
+		throw "cannot parse line \"" + line + "\" at character " + pline[0];
+	}
 };
 
 void FmData::load(std::string filename) {
