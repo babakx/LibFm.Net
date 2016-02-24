@@ -20,8 +20,12 @@
 #include "libfm/src/fm_learn_sgd_element_adapt_reg.h"
 #include "libfm/src/fm_learn_mcmc_simultaneous.h"
 
+#include <msclr\marshal_cppstd.h>
+
 using namespace System;
 using namespace System::Collections::Generic;
+using namespace msclr::interop;
+using namespace System::Runtime::InteropServices;
 
 namespace LibFm {
 
@@ -31,25 +35,84 @@ namespace LibFm {
 		float target;
 		List<int> ^featureIds;
 		List<float> ^featureValues;
+		
+		String^ ToStringLine()
+		{
+			String^ line = target.ToString();
+
+			for (int i = 0; i < featureIds->Count; i++)
+			{
+				line += " " + featureIds[i] + ":" + featureValues[i];
+			}
+
+			return line;
+		};
 	};
 
 	public ref class LibFmManager
 	{
 	private:
-		fm_model *fm;
 		FmData *train;
+		FmData *test;
+		fm_model *fm;
 		fm_learn* fml;
 
 	public:
-		void AddTrainVector(FeatureVector ^v)
+		void CreateTrainSet(List<String^> ^featVectors, float minTarget, float maxTarget, UInt64 numFeatValues, int numFeatures)
 		{
+			train->initialize(minTarget, maxTarget, featVectors->Count, numFeatValues, numFeatures);
 			
+			for (int i = 0; i < featVectors->Count; i++)
+			{
+				std::string stdFeatVetor = marshal_as<std::string>(featVectors[i]);
+				train->addFeatureVecor(stdFeatVetor);
+			}
+
+			train->finalizeData();
+		};
+
+		void Train()
+		{
+			fml->learn(*train, *test);
 		}
 
-		void Train(int argc, char **params)
+		void Clear()
 		{
+			delete train;
+			delete test;
+			delete fm;
+			delete fml;
+		}
+
+		double Predict(FeatureVector ^fv)
+		{
+			sparse_row<FM_FLOAT> sample;
+			sparse_entry<FM_FLOAT> *features = new sparse_entry<FM_FLOAT>[fv->featureIds->Count];
+			for (int i = 0; i < fv->featureIds->Count; i++)
+			{
+				features[i].id = fv->featureIds[i];		// here int is assigned to uint
+				features[i].value = fv->featureValues[i]; // here FM_FLOAT is casted to float
+			}
+			sample.data = features;
+			sample.size = fv->featureIds->Count;
+
+			return fm->predict(sample);
+		};
+
+		void Setup(List<String^> ^params)
+		{
+			
+			//marshal_context context;
+			char **paramsArray = new char*[params->Count];
+			for (int i = 0; i < params->Count; i++)
+			{
+				IntPtr ptrToNativeString = Marshal::StringToHGlobalAnsi(params[i]);
+				char* nativeString = static_cast<char*>(ptrToNativeString.ToPointer());
+				paramsArray[i] = nativeString;
+			}
+			
 			try {
-				CMDLine cmdline(argc, params);
+				CMDLine cmdline(params->Count, paramsArray);
 				const std::string param_task = cmdline.registerParameter("task", "r=regression, c=binary classification [MANDATORY]");
 				const std::string param_train_file = cmdline.registerParameter("train", "filename for training data [MANDATORY]");
 				const std::string param_test_file = cmdline.registerParameter("test", "filename for test data [MANDATORY]");
@@ -82,18 +145,18 @@ namespace LibFm {
 
 				// (1) Load the data
 				std::cout << "Loading train...\t" << std::endl;
-				FmData train(0,
+				train = new FmData(0,
 					!(!cmdline.getValue(param_method).compare("mcmc")), // no original data for mcmc
 					!(!cmdline.getValue(param_method).compare("sgd") || !cmdline.getValue(param_method).compare("sgda")) // no transpose data for sgd, sgda
 					);
-				train.load(cmdline.getValue(param_train_file));
+				//train.load(cmdline.getValue(param_train_file));
 
 				std::cout << "Loading test... \t" << std::endl;
-				FmData test(0,
+				test = new FmData(0,
 					!(!cmdline.getValue(param_method).compare("mcmc")), // no original data for mcmc
 					!(!cmdline.getValue(param_method).compare("sgd") || !cmdline.getValue(param_method).compare("sgda")) // no transpose data for sgd, sgda
 					);
-				test.load(cmdline.getValue(param_test_file));
+				//test.load(cmdline.getValue(param_test_file));
 
 				fm = new fm_model();
 				// (2) Setup the factorization machine
@@ -125,7 +188,7 @@ namespace LibFm {
 					fml = new fm_learn_mcmc_simultaneous();
 					//fml->validation = validation;
 					((fm_learn_mcmc*)fml)->num_iter = cmdline.getValue(param_num_iter, 100);
-					((fm_learn_mcmc*)fml)->num_eval_cases = cmdline.getValue(param_num_eval_cases, test.num_cases);
+					((fm_learn_mcmc*)fml)->num_eval_cases = 0; //cmdline.getValue(param_num_eval_cases, test.num_cases);
 
 					((fm_learn_mcmc*)fml)->do_sample = cmdline.getValue(param_do_sampling, true);
 					((fm_learn_mcmc*)fml)->do_multilevel = cmdline.getValue(param_do_multilevel, true);
@@ -134,16 +197,16 @@ namespace LibFm {
 					throw "unknown method";
 				}
 				fml->fm = fm;
-				fml->max_target = train.max_target; //TODO
-				fml->min_target = train.min_target;	//TODO
+				fml->max_target = train->max_target; //TODO
+				fml->min_target = train->min_target;	//TODO
 				//fml->meta = &meta;
 				if (!cmdline.getValue("task").compare("r")) {
 					fml->task = 0;
 				}
 				else if (!cmdline.getValue("task").compare("c")) {
 					fml->task = 1;
-					for (uint i = 0; i < train.target.dim; i++) { if (train.target(i) <= 0.0) { train.target(i) = -1.0; } else { train.target(i) = 1.0; } }
-					for (uint i = 0; i < test.target.dim; i++) { if (test.target(i) <= 0.0) { test.target(i) = -1.0; } else { test.target(i) = 1.0; } }
+					for (uint i = 0; i < train->target.dim; i++) { if (train->target(i) <= 0.0) { train->target(i) = -1.0; } else { train->target(i) = 1.0; } }
+					for (uint i = 0; i < test->target.dim; i++) { if (test->target(i) <= 0.0) { test->target(i) = -1.0; } else { test->target(i) = 1.0; } }
 				}
 				else {
 					throw "unknown task";
@@ -223,14 +286,14 @@ namespace LibFm {
 		
 
 
-
+			
 				// () learn		
-				fml->learn(train, test);
+				//fml->learn(*train, test);
 
 				// () Prediction at the end  (not for mcmc and als)
-				if (cmdline.getValue(param_method).compare("mcmc")) {
-					std::cout << "Final\t" << "Train=" << fml->evaluate(train) << "\tTest=" << fml->evaluate(test) << std::endl;
-				}
+				//if (cmdline.getValue(param_method).compare("mcmc")) {
+				//	std::cout << "Final\t" << "Train=" << fml->evaluate(*train) << "\tTest=" << fml->evaluate(test) << std::endl;
+				//}
 
 
 			}

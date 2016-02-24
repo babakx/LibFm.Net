@@ -129,6 +129,9 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies />
     </Link>
+    <PostBuildEvent>
+      <Command>copy "D:\Dropbox\Projects\WrapRec Projects\libfm\x64\Release\Libfm.dll" "D:\Dropbox\Projects\WrapRec Projects\WrapRec\lib\LibFm.dll"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <Reference Include="System" />
