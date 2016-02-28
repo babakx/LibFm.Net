@@ -59,8 +59,8 @@
 
 using namespace std;
 
-int main(int argc, char **argv) { 
- 	
+int main(int argc, vector<std::string> argv) { 
+	
 	try {
 		CMDLine cmdline(argc, argv);
 		std::cout << "----------------------------------------------------------------------------" << std::endl;
@@ -439,5 +439,5 @@ int main(int argc, char **argv) {
 		std::cerr << std::endl << "ERROR: " << e << std::endl;
 	}
 
-
+	
 }

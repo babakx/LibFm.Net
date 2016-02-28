@@ -111,14 +111,18 @@ double fm_model::predict(sparse_row<FM_FLOAT>& x, DVector<double> &sum, DVector<
 	}
 	if (k1) {
 		for (uint i = 0; i < x.size; i++) {
-			assert(x.data[i].id < num_attribute);
-			result += w(x.data[i].id) * x.data[i].value;
+			//assert(x.data[i].id < num_attribute);
+			if (x.data[i].id < num_attribute)
+				result += w(x.data[i].id) * x.data[i].value;
 		}
 	}
 	for (int f = 0; f < num_factor; f++) {
 		sum(f) = 0;
 		sum_sqr(f) = 0;
 		for (uint i = 0; i < x.size; i++) {
+			if (x.data[i].id >= num_attribute)
+				continue;
+
 			double d = v(f,x.data[i].id) * x.data[i].value;
 			sum(f) += d;
 			sum_sqr(f) += d*d;

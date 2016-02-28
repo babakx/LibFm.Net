@@ -46,10 +46,10 @@ class CMDLine {
 	public:
 		std::string delimiter;
 
-		CMDLine(int argc, char **argv) {
+		CMDLine(int argc, std::vector<std::string> argv) {
 			delimiter = ";,";
-			int i = 1;
-			while (i < argc) {
+			int i = 0;
+			while (i < argc - 1) {
 				std::string s(argv[i]);
 				if (parse_name(s)) {
 					if (value.find(s) != value.end()) {
@@ -119,7 +119,7 @@ class CMDLine {
 			}
 		}
 
-		const std::string& getValue(const std::string& parameter) {
+		const std::string getValue(const std::string& parameter) {
 			return value[parameter];
 		}
 

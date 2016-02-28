@@ -108,21 +108,23 @@ class FmData {
 		void create_data_t();
 };
 
-void FmData::initialize(DATA_FLOAT minRating, DATA_FLOAT maxRating, int num_rows, uint64 num_values, int num_feat)
+void FmData::initialize(DATA_FLOAT minRating, DATA_FLOAT maxRating, int numRows, uint64 num_values, int num_feat)
 {
 	min_target = minRating;
 	max_target = maxRating;
 
 	this->data = new LargeSparseMatrixMemory<DATA_FLOAT>();
+	
+	((LargeSparseMatrixMemory<DATA_FLOAT>*)this->data)->data.setSize(numRows);
 
-	((LargeSparseMatrixMemory<DATA_FLOAT>*)this->data)->data.setSize(num_rows);
-	target.setSize(num_rows);
+	num_rows = numRows;
+	target.setSize(numRows);
 	
 	num_feature = num_feat;
 
 	((LargeSparseMatrixMemory<DATA_FLOAT>*)this->data)->num_cols = num_feat;
 	((LargeSparseMatrixMemory<DATA_FLOAT>*)this->data)->num_values = num_values;
-
+	
 	cache = new sparse_entry<DATA_FLOAT>[num_values];
 };
 
@@ -152,7 +154,7 @@ void FmData::addFeatureVecor(std::string line)
 
 		while (sscanf(pline, "%d:%f%n", &_feature, &_value, &nchar) >= 2) {
 			pline += nchar;
-			assert(cache_id < num_values);
+			//assert(cache_id < num_values);
 			cache[cache_id].id = _feature;
 			cache[cache_id].value = _value;
 			cache_id++;
