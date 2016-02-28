@@ -92,6 +92,7 @@ class FmData {
 		uint num_cases;
 		int num_rows = 0;
 		int row_id = 0;
+		uint64 cache_id = 0;
 		sparse_entry<DATA_FLOAT>* cache;
 
 		DATA_FLOAT min_target;
@@ -137,7 +138,6 @@ void FmData::finalizeData()
 
 void FmData::addFeatureVecor(std::string line)
 {
-	uint64 cache_id = 0;
 	DATA_FLOAT _value;
 	int nchar, _feature;
 
