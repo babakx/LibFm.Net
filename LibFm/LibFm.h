@@ -74,23 +74,10 @@ namespace LibFm {
 			
 			train->finalizeData();
 
-			test->initialize(min, max, 1, 2, 2);
-			std::string sampleTest = "5 0:1 1:1";
-			std::string sampleTest2 = "2 2:1 3:1";
-			std::string sampleTest3 = "1 1:1 4:1";
-			std::string sampleTest4 = "5 5:1 6:1";
-			std::string sampleTest5 = "5 7:1 8:1";
-
-			test->addFeatureVecor(sampleTest);
-			//test->addFeatureVecor(sampleTest2);
-			//test->addFeatureVecor(sampleTest3);
-			//test->addFeatureVecor(sampleTest4);
-			//test->addFeatureVecor(sampleTest5);
-
+			test->initialize(min, max, 0, 0, 0);
 			test->finalizeData();
 
 			SetupModel();
-
 		};
 
 		void Train()
@@ -131,6 +118,34 @@ namespace LibFm {
 			const std::string param_do_multilevel = "do_multilevel";
 			const std::string param_learn_rate = "learn_rate";
 			const std::string param_regular = "regular";
+			const std::string param_relation = "relation";
+			const std::string param_cache_size = "cache_size";
+			try
+			{
+
+			DVector<RelationData*> relation;
+			// (1.2) Load relational data
+			{
+				std::vector<std::string> rel = cmdline->getStrValues(param_relation);
+
+				std::cout << "#relations: " << rel.size() << std::endl;
+				relation.setSize(rel.size());
+				train->relation.setSize(rel.size());
+				test->relation.setSize(rel.size());
+				for (uint i = 0; i < rel.size(); i++) {
+					relation(i) = new RelationData(
+						cmdline->getValue(param_cache_size, 0),
+						!(!cmdline->getValue(param_method).compare("mcmc")), // no original data for mcmc
+						!(!cmdline->getValue(param_method).compare("sgd") || !cmdline->getValue(param_method).compare("sgda")) // no transpose data for sgd, sgda
+						);
+					relation(i)->load(rel[i]);
+					train->relation(i).data = relation(i);
+					test->relation(i).data = relation(i);
+					train->relation(i).load(rel[i] + ".train", train->num_cases);
+					test->relation(i).load(rel[i] + ".test", test->num_cases);
+				}
+			}
+
 
 			uint num_all_attribute = train->num_feature;
 
@@ -147,9 +162,9 @@ namespace LibFm {
 			DataMetaInfo meta(num_all_attribute);
 			{
 				meta.num_attr_groups = meta_main.num_attr_groups;
-				//for (uint r = 0; r < relation->dim; r++) {
-				//	meta.num_attr_groups += relation(r)->meta->num_attr_groups;
-				//}
+				for (uint r = 0; r < relation.dim; r++) {
+					meta.num_attr_groups += relation(r)->meta->num_attr_groups;
+				}
 				meta.num_attr_per_group.setSize(meta.num_attr_groups);
 				meta.num_attr_per_group.init(0);
 				for (uint i = 0; i < meta_main.attr_group.dim; i++) {
@@ -159,8 +174,8 @@ namespace LibFm {
 
 				uint attr_cntr = meta_main.attr_group.dim;
 				uint attr_group_cntr = meta_main.num_attr_groups;
-				/*
-				for (uint r = 0; r < relation->dim; r++) {
+				
+				for (uint r = 0; r < relation.dim; r++) {
 					for (uint i = 0; i < relation(r)->meta->attr_group.dim; i++) {
 						meta.attr_group(i + attr_cntr) = attr_group_cntr + relation(r)->meta->attr_group(i);
 						meta.num_attr_per_group(attr_group_cntr + relation(r)->meta->attr_group(i))++;
@@ -168,13 +183,12 @@ namespace LibFm {
 					attr_cntr += relation(r)->meta->attr_group.dim;
 					attr_group_cntr += relation(r)->meta->num_attr_groups;
 				}
-				*/
+				
 
 			}
 			meta.num_relations = train->relation.dim;
 
-			try 
-			{
+
 			
 				fm = new fm_model();
 				// (2) Setup the factorization machine
@@ -193,6 +207,7 @@ namespace LibFm {
 
 				}
 
+				//fm_learn *fml;
 
 				// (3) Setup the learning method:
 				if (!cmdline->getValue(param_method).compare("sgd")) {
@@ -216,7 +231,14 @@ namespace LibFm {
 				fml->fm = fm;
 				fml->max_target = train->max_target; //TODO
 				fml->min_target = train->min_target;	//TODO
-				fml->meta = &meta;
+		
+				fml->meta = new DataMetaInfo(num_all_attribute);
+				fml->meta->num_relations = 0;
+				for (uint i = 0; i < num_all_attribute; i++) {
+					fml->meta->attr_group(i) = meta_main.attr_group(i);
+					fml->meta->num_attr_per_group(meta.attr_group(i))++;
+				}
+
 				if (!cmdline->getValue("task").compare("r")) {
 					fml->task = 0;
 				}
