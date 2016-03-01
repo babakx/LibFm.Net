@@ -214,11 +214,11 @@ class fm_learn_mcmc_simultaneous : public fm_learn_mcmc {
 				// Evaluate the test data sets
 				if (task == TASK_REGRESSION) {
 					double rmse_test_this, mae_test_this, rmse_test_all, mae_test_all, rmse_test_all_but5, mae_test_all_but5;
-					 _evaluate(pred_this, test.target, 1.0, rmse_test_this, mae_test_this, num_eval_cases);
-					 _evaluate(pred_sum_all, test.target, 1.0/(i+1), rmse_test_all, mae_test_all, num_eval_cases);
-					 _evaluate(pred_sum_all_but5, test.target, 1.0/(i-5+1), rmse_test_all_but5, mae_test_all_but5, num_eval_cases);
+					 //_evaluate(pred_this, test.target, 1.0, rmse_test_this, mae_test_this, num_eval_cases);
+					 //_evaluate(pred_sum_all, test.target, 1.0/(i+1), rmse_test_all, mae_test_all, num_eval_cases);
+					 //_evaluate(pred_sum_all_but5, test.target, 1.0/(i-5+1), rmse_test_all_but5, mae_test_all_but5, num_eval_cases);
 
-					std::cout << "#Iter=" << std::setw(3) << i << "\tTrain=" << rmse_train << "\tTest=" << rmse_test_all << std::endl;
+					//std::cout << "#Iter=" << std::setw(3) << i << "\tTrain=" << rmse_train << "\tTest=" << rmse_test_all << std::endl;
 
 					if (log != NULL) {
 						log->log("rmse", rmse_test_all);

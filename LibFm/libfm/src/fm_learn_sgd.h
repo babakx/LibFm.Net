@@ -47,9 +47,9 @@ class fm_learn_sgd: public fm_learn {
 
 		virtual void learn(FmData& train, FmData& test) { 
 			fm_learn::learn(train, test);
-			std::cout << "learnrate=" << learn_rate << std::endl;
-			std::cout << "learnrates=" << learn_rates(0) << "," << learn_rates(1) << "," << learn_rates(2) << std::endl;
-			std::cout << "#iterations=" << num_iter << std::endl;
+			//std::cout << "learnrate=" << learn_rate << std::endl;
+			//std::cout << "learnrates=" << learn_rates(0) << "," << learn_rates(1) << "," << learn_rates(2) << std::endl;
+			//std::cout << "#iterations=" << num_iter << std::endl;
 
 			if (train.relation.dim > 0) {
 				throw "relations are not supported with SGD";

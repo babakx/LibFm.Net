@@ -376,12 +376,12 @@ void FmData::create_data_t() {
 
 	// create data structure for values
 	MemoryLog::getInstance().logNew("data_float", sizeof(sparse_entry<DATA_FLOAT>), num_values);			
-	sparse_entry<DATA_FLOAT>* cache = new sparse_entry<DATA_FLOAT>[num_values];
-	long long cache_id = 0;
+	sparse_entry<DATA_FLOAT>* cache_t = new sparse_entry<DATA_FLOAT>[num_values];
+	long long cache_id_t = 0;
 	for (uint i = 0; i < data_t.dim; i++) {
-		data_t.value[i].data = &(cache[cache_id]);
+		data_t.value[i].data = &(cache_t[cache_id_t]);
 		data_t(i).size = num_values_per_column(i);
-		cache_id += num_values_per_column(i);				
+		cache_id_t += num_values_per_column(i);				
 	} 
 	// write the data into the transpose matrix
 	num_values_per_column.init(0); // num_values per column now contains the pointer on the first empty field
