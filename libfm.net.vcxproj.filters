@@ -1,0 +1,81 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="util">
+      <UniqueIdentifier>{dfb2047a-df4b-4b8f-a975-f6aae7886c76}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="fm_core">
+      <UniqueIdentifier>{85728e04-7c4b-4c5d-b54d-762baf3e6501}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="libfm">
+      <UniqueIdentifier>{f23773cc-3842-408c-bb16-0326af4cb362}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="libfm\src">
+      <UniqueIdentifier>{7bb07578-7d7d-4a13-865c-3b4a89286ec0}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="fm_core\fm_data.h">
+      <Filter>fm_core</Filter>
+    </ClInclude>
+    <ClInclude Include="fm_core\fm_model.h">
+      <Filter>fm_core</Filter>
+    </ClInclude>
+    <ClInclude Include="fm_core\fm_sgd.h">
+      <Filter>fm_core</Filter>
+    </ClInclude>
+    <ClInclude Include="libfm\src\Data.h">
+      <Filter>libfm\src</Filter>
+    </ClInclude>
+    <ClInclude Include="libfm\src\fm_learn.h">
+      <Filter>libfm\src</Filter>
+    </ClInclude>
+    <ClInclude Include="libfm\src\fm_learn_mcmc.h">
+      <Filter>libfm\src</Filter>
+    </ClInclude>
+    <ClInclude Include="libfm\src\fm_learn_mcmc_simultaneous.h">
+      <Filter>libfm\src</Filter>
+    </ClInclude>
+    <ClInclude Include="libfm\src\fm_learn_sgd.h">
+      <Filter>libfm\src</Filter>
+    </ClInclude>
+    <ClInclude Include="libfm\src\fm_learn_sgd_element.h">
+      <Filter>libfm\src</Filter>
+    </ClInclude>
+    <ClInclude Include="libfm\src\fm_learn_sgd_element_adapt_reg.h">
+      <Filter>libfm\src</Filter>
+    </ClInclude>
+    <ClInclude Include="libfm\src\relation.h">
+      <Filter>libfm\src</Filter>
+    </ClInclude>
+    <ClInclude Include="util\cmdline.h">
+      <Filter>util</Filter>
+    </ClInclude>
+    <ClInclude Include="util\fmatrix.h">
+      <Filter>util</Filter>
+    </ClInclude>
+    <ClInclude Include="util\matrix.h">
+      <Filter>util</Filter>
+    </ClInclude>
+    <ClInclude Include="util\memory.h">
+      <Filter>util</Filter>
+    </ClInclude>
+    <ClInclude Include="util\random.h">
+      <Filter>util</Filter>
+    </ClInclude>
+    <ClInclude Include="util\rlog.h">
+      <Filter>util</Filter>
+    </ClInclude>
+    <ClInclude Include="util\smatrix.h">
+      <Filter>util</Filter>
+    </ClInclude>
+    <ClInclude Include="util\util.h">
+      <Filter>util</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="libfm\libfm.cpp">
+      <Filter>libfm</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
